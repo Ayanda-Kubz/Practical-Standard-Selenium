@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 @CucumberOptions(
         features = "src\\test\\resources\\features",
         glue = "WEB.testDefinitions",
-        tags = "@NegativeTests",
+//        tags = "@NegativeTests",
         monochrome = true,
         plugin = "html:Results\\report.html"
 )

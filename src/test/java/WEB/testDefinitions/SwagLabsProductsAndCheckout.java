@@ -20,6 +20,7 @@ public class SwagLabsProductsAndCheckout {
 //    declaration of driver and pages of website
     WebDriver driver;
     ConfigReader configReader;
+    Properties config;
     LoginPage loginPage;
     InventoryPage inventoryPage;
     YourInfoPage yourInfoPage;
@@ -34,7 +35,7 @@ public class SwagLabsProductsAndCheckout {
         WebDriverManager.edgedriver().clearDriverCache().setup();
         driver = new EdgeDriver();
         configReader = new ConfigReader(driver);
-        Properties config = configReader.readProperties();
+        config = configReader.readProperties();
         driver.get(config.getProperty("baseUrl"));
         driver.manage().window().maximize();
         driver.manage().deleteAllCookies();
@@ -44,14 +45,14 @@ public class SwagLabsProductsAndCheckout {
 
 //    This for is for standard user following website
 
-    @Given("User enters username {string} and password {string} and logs in for Test Case {string}")
-    public void userLogsIn(String username, String password, String testCase){
+    @Given("User enters username and password and logs in for Test Case {string}")
+    public void userLogsIn(String testCase){
         this.testCaseNo=testCase;
         loginPage = new LoginPage(driver);
 
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
-        loginPage.sendUsername(username);
-        loginPage.sendPassword(password);
+        loginPage.sendUsername(config.getProperty("standard_username"));
+        loginPage.sendPassword(config.getProperty("standard_password"));
         loginPage.clickLoginBtn();
     }
 
@@ -148,14 +149,27 @@ public class SwagLabsProductsAndCheckout {
 
 //  This flow is for Locked User
 
-    @Given("Locked user enters username {string} and password {string} and logs in for Test Case {string}")
-    public void lockedUserLogsIn(String username, String password,String testCase){
+    @Given("Locked user enters username and password and logs in for Test Case {string}")
+    public void lockedUserLogsIn(String testCase){
         this.testCaseNo=testCase;
         configReader.takeScreenshot("LockOutError",folderPath,testCaseNo);
         loginPage = new LoginPage(driver);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
-        loginPage.sendUsername(username);
-        loginPage.sendPassword(password);
+        loginPage.sendUsername(config.getProperty("locked_username"));
+        loginPage.sendPassword(config.getProperty("locked_password"));
+        loginPage.clickLoginBtn();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
+        loginPage.getErrorMessage();
+        configReader.takeScreenshot("LockErrorMsg",folderPath,testCaseNo);
+    }
+    @Given("Incorrect user enters username and password and logs in for Test Case {string}")
+    public void incorrectUserLogsIn(String testCase){
+        this.testCaseNo=testCase;
+        configReader.takeScreenshot("LockOutError",folderPath,testCaseNo);
+        loginPage = new LoginPage(driver);
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
+        loginPage.sendUsername(config.getProperty("incorrect_username"));
+        loginPage.sendPassword(config.getProperty("incorrect_password"));
         loginPage.clickLoginBtn();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
         loginPage.getErrorMessage();
@@ -193,7 +207,19 @@ public class SwagLabsProductsAndCheckout {
         configReader.takeScreenshot(filterText,folderPath,testCaseNo);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
     }
-//    ****************************************************************************************
+//    ****************************************************************************************\
+
+    @Given("Different Users enters username {string} and password {string} and logs in for Test Case {string}")
+    public void differentUserLogsIn(String username, String password, String testCase){
+        this.testCaseNo=testCase;
+        loginPage = new LoginPage(driver);
+
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
+        loginPage.sendUsername(username);
+        loginPage.sendPassword(password);
+        loginPage.clickLoginBtn();
+    }
+//    ****************************************************************************************\
 
 //    Logout flow
     @Then("User Logs Out")
